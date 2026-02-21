@@ -8,37 +8,52 @@ import {
 import { createElement } from 'react';
 import type {
   SurveyState,
-  YesNoResponse,
-  LikertResponse,
+  ImagePair,
   ImageComparisonResponse,
 } from '../types/survey';
+import { generateRandomPair } from '../data/questions';
 
 type SurveyAction =
-  | {
-      type: 'SET_DEMOGRAPHIC';
-      questionId: string;
-      value: YesNoResponse | LikertResponse;
-    }
+  | { type: 'SET_IDENTIFIER'; value: string }
+  | { type: 'SET_DEMOGRAPHIC'; questionId: string; value: string }
+  | { type: 'SET_STRESS'; questionId: string; value: number }
   | {
       type: 'SET_COMPARISON';
       questionId: string;
       value: ImageComparisonResponse;
     }
+  | { type: 'ADD_PAIR'; pair: ImagePair }
   | { type: 'COMPLETE' };
 
-const initialState: SurveyState = {
-  demographicResponses: {},
-  comparisonResponses: {},
-  completed: false,
-};
+function createInitialState(): SurveyState {
+  return {
+    startTime: Date.now(),
+    imagePairs: [generateRandomPair(0)],
+    identifierResponse: '',
+    demographicResponses: {},
+    comparisonResponses: {},
+    stressResponses: {},
+    completed: false,
+  };
+}
 
 function surveyReducer(state: SurveyState, action: SurveyAction): SurveyState {
   switch (action.type) {
+    case 'SET_IDENTIFIER':
+      return { ...state, identifierResponse: action.value };
     case 'SET_DEMOGRAPHIC':
       return {
         ...state,
         demographicResponses: {
           ...state.demographicResponses,
+          [action.questionId]: action.value,
+        },
+      };
+    case 'SET_STRESS':
+      return {
+        ...state,
+        stressResponses: {
+          ...state.stressResponses,
           [action.questionId]: action.value,
         },
       };
@@ -49,6 +64,11 @@ function surveyReducer(state: SurveyState, action: SurveyAction): SurveyState {
           ...state.comparisonResponses,
           [action.questionId]: action.value,
         },
+      };
+    case 'ADD_PAIR':
+      return {
+        ...state,
+        imagePairs: [...state.imagePairs, action.pair],
       };
     case 'COMPLETE':
       return { ...state, completed: true };
@@ -63,7 +83,7 @@ const SurveyContext = createContext<{
 } | null>(null);
 
 export function SurveyProvider({ children }: { children: ReactNode }) {
-  const [state, dispatch] = useReducer(surveyReducer, initialState);
+  const [state, dispatch] = useReducer(surveyReducer, null, createInitialState);
   return createElement(
     SurveyContext.Provider,
     { value: { state, dispatch } },
@@ -79,11 +99,16 @@ export function useSurvey() {
 
   const { state, dispatch } = context;
 
-  function setDemographicResponse(
-    questionId: string,
-    value: YesNoResponse | LikertResponse,
-  ) {
+  function setIdentifierResponse(value: string) {
+    dispatch({ type: 'SET_IDENTIFIER', value });
+  }
+
+  function setDemographicResponse(questionId: string, value: string) {
     dispatch({ type: 'SET_DEMOGRAPHIC', questionId, value });
+  }
+
+  function setStressResponse(questionId: string, value: number) {
+    dispatch({ type: 'SET_STRESS', questionId, value });
   }
 
   function setComparisonResponse(
@@ -93,14 +118,21 @@ export function useSurvey() {
     dispatch({ type: 'SET_COMPARISON', questionId, value });
   }
 
+  function addPair(pair: ImagePair) {
+    dispatch({ type: 'ADD_PAIR', pair });
+  }
+
   function completeSurvey() {
     dispatch({ type: 'COMPLETE' });
   }
 
   return {
     state,
+    setIdentifierResponse,
     setDemographicResponse,
+    setStressResponse,
     setComparisonResponse,
+    addPair,
     completeSurvey,
   };
 }

@@ -1,49 +1,63 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSurvey } from '../hooks/useSurvey';
-import { comparisonQuestions } from '../data/questions';
-import ProgressBar from '../components/ProgressBar';
+import { generateRandomPair } from '../data/questions';
 import ImageComparisonQuestion from '../components/ImageComparisonQuestion';
 import type { ImageComparisonResponse } from '../types/survey';
 
 export default function ImageComparisonPage() {
   const { index } = useParams<{ index: string }>();
   const navigate = useNavigate();
-  const { state, setComparisonResponse, completeSurvey } = useSurvey();
+  const { state, setComparisonResponse, addPair, completeSurvey } = useSurvey();
 
   const idx = Number(index);
-  const question = comparisonQuestions[idx];
+  const pair = state.imagePairs[idx];
 
-  if (!question) {
+  if (!pair) {
     navigate('/thank-you', { replace: true });
     return null;
   }
 
-  const handleSelect = (value: ImageComparisonResponse) => {
-    setComparisonResponse(question.id, value);
-
-    if (idx < comparisonQuestions.length - 1) {
-      navigate(`/survey/comparison/${idx + 1}`);
-    } else {
-      completeSurvey();
-      navigate('/thank-you');
+  function handleSelect(value: ImageComparisonResponse) {
+    setComparisonResponse(pair.id, value);
+    const nextIdx = idx + 1;
+    if (!state.imagePairs[nextIdx]) {
+      addPair(generateRandomPair(nextIdx));
     }
-  };
+    navigate(`/survey/comparison/${nextIdx}`);
+  }
+
+  function handleFinish() {
+    completeSurvey();
+    navigate('/thank-you');
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 p-4">
       <div className="max-w-3xl mx-auto mt-8">
-        <ProgressBar current={idx + 2} total={6} />
+        <div className="mb-6 text-sm text-gray-500">
+          Comparison #{idx + 1}
+        </div>
         <div className="bg-white rounded-2xl shadow-lg p-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">
-            Image Comparison {idx + 1} of {comparisonQuestions.length}
+            Street View Comparison #{idx + 1}
           </h2>
+
           <ImageComparisonQuestion
-            prompt={question.prompt}
-            imageA={question.imageA}
-            imageB={question.imageB}
-            value={state.comparisonResponses[question.id]}
+            prompt="Which area looks more likely to flood?"
+            imageA={pair.imageA}
+            imageB={pair.imageB}
+            value={state.comparisonResponses[pair.id]}
             onSelect={handleSelect}
           />
+
+          <div className="mt-8 flex justify-end">
+            <button
+              onClick={handleFinish}
+              className="px-6 py-3 rounded-lg text-lg font-medium transition-colors bg-gray-600 text-white hover:bg-gray-700 cursor-pointer"
+            >
+              Finish Survey
+            </button>
+          </div>
         </div>
       </div>
     </div>

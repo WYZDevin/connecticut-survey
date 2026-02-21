@@ -11,12 +11,12 @@ export default function WelcomePage() {
         </h1>
         <p className="text-gray-600 mb-8 leading-relaxed">
           Thank you for participating in this research study. This survey will
-          ask you a few questions about your experience with natural disasters
-          and then show you pairs of images to compare. It should take about 5
-          minutes to complete.
+          ask you about your background, then show you pairs of street view
+          images and ask questions about environmental risk and perceived stress.
+          It should take about 10-15 minutes to complete.
         </p>
         <button
-          onClick={() => navigate('/survey/demographic')}
+          onClick={() => navigate('/survey/identifier')}
           className="bg-blue-600 text-white px-8 py-3 rounded-lg text-lg font-medium hover:bg-blue-700 transition-colors cursor-pointer"
         >
           Begin Survey
