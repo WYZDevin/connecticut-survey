@@ -1,5 +1,9 @@
 import { useSurvey } from '../hooks/useSurvey';
-import { demographicQuestions, stressQuestions } from '../data/questions';
+import {
+  demographicQuestions,
+  stressQuestions,
+  comparisonPrompts,
+} from '../data/questions';
 
 function formatElapsed(ms: number): string {
   const totalSeconds = Math.floor(ms / 1000);
@@ -107,14 +111,21 @@ export default function ThankYouPage() {
             </h3>
             {state.imagePairs.map((pair, pairIdx) => (
               <div key={pair.id} className="border-t border-gray-200 pt-2">
-                <p className="font-medium">
+                <p className="font-semibold text-gray-700">
                   Pair {pairIdx + 1}: {pair.imageA.src} vs {pair.imageB.src}
                 </p>
-                <p className="text-blue-600">
-                  {state.comparisonResponses[pair.id]
-                    ? `Selected ${state.comparisonResponses[pair.id]}`
-                    : '\u2014'}
-                </p>
+                {comparisonPrompts.map((cp) => {
+                  const key = `${pair.id}-${cp.id}`;
+                  const val = state.comparisonResponses[key];
+                  return (
+                    <div key={key} className="ml-4">
+                      <p className="font-medium">{cp.prompt}</p>
+                      <p className="text-blue-600">
+                        {val ? `Image ${val}` : '\u2014'}
+                      </p>
+                    </div>
+                  );
+                })}
               </div>
             ))}
           </div>

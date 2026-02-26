@@ -76,10 +76,44 @@ export function generateRandomPair(index: number): ImagePair {
   }
   return {
     id: `comparison-${index + 1}`,
-    imageA: { src: `/svi/${idA}.jpg`, label: 'Image A' },
-    imageB: { src: `/svi/${idB}.jpg`, label: 'Image B' },
+    imageA: { src: `/svi/${idA}.jpg`, label: 'Left' },
+    imageB: { src: `/svi/${idB}.jpg`, label: 'Right' },
   };
 }
+
+// --- Comparison prompts (3 questions per image pair) ---
+
+export const comparisonPrompts = [
+  {
+    id: 'flood',
+    prompt:
+      'Which area looks more likely to be flooded?',
+  },
+  {
+    id: 'heatwave',
+    prompt:
+      'Which area looks more likely to be exposed to heatwaves?',
+  },
+  {
+    id: 'wildfire',
+    prompt:
+      'Which area looks more likely to have a wildfire occurred?',
+  },
+  {
+    id: 'crime',
+    prompt:
+      'Which place appears to be safer from crime (i.e., less possibility of crime events)?',
+  },
+  {
+    id: 'transport',
+    prompt:
+      'Which place appears to be safer for active transport (e.g., walking or cycling for travel) with fewer barriers and hazards?',
+  },
+  {
+    id: 'noise',
+    prompt: 'Which place appears to be less noisy?',
+  },
+];
 
 // --- Perceived Stress (Q10-Q14, asked once before comparisons) ---
 
