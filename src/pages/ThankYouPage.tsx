@@ -48,7 +48,7 @@ export default function ThankYouPage() {
         <h1 className="text-3xl font-bold text-gray-900 mb-4">Thank You!</h1>
         <p className="text-gray-600 mb-4 leading-relaxed">
           Your responses have been recorded. Thank you for contributing to
-          Connecticut flood risk research.
+          our research.
         </p>
         <p className="text-sm text-gray-500 mb-6">
           You completed {state.imagePairs.length} comparison{state.imagePairs.length !== 1 ? 's' : ''} in {formatElapsed(elapsed)}.
