@@ -68,7 +68,7 @@ export type StressQuestion = FrequencyQuestion | AgreementQuestion;
 export type LikertResponse = 1 | 2 | 3 | 4 | 5;
 export type AgreementResponse = 1 | 2 | 3 | 4 | 5;
 export type FrequencyResponse = 0 | 1 | 2 | 3 | 4;
-export type ImageComparisonResponse = 'A' | 'B';
+export type ImageComparisonResponse = 'A' | 'E' | 'B';
 
 export interface MultiChoiceResponseValue {
   selected: string[];

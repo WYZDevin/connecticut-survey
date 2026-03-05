@@ -88,7 +88,7 @@ export default function ImageComparisonPage() {
                   {i + 1}. {p.prompt}
                 </p>
                 <div className="flex gap-2">
-                  {(['A', 'B'] as ImageComparisonResponse[]).map((opt) => (
+                  {(['A', 'E', 'B'] as ImageComparisonResponse[]).map((opt) => (
                     <button
                       key={opt}
                       type="button"
@@ -99,7 +99,7 @@ export default function ImageComparisonPage() {
                           : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
                       }`}
                     >
-                      {opt === 'A' ? 'Left' : 'Right'}
+                      {opt === 'A' ? 'Left' : opt === 'B' ? 'Right' : 'Equal'}
                     </button>
                   ))}
                 </div>

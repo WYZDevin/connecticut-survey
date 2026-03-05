@@ -62,6 +62,17 @@ export default function ImageComparisonQuestion({
           selected={value === 'A'}
           onClick={() => onSelect('A')}
         />
+        <button
+          type="button"
+          onClick={() => onSelect('E')}
+          className={`md:w-40 h-14 self-center rounded-xl border-3 px-4 text-sm font-semibold transition-all cursor-pointer ${
+            value === 'E'
+              ? 'border-blue-600 bg-blue-50 text-blue-700'
+              : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
+          }`}
+        >
+          Equal
+        </button>
         <ImageCard
           src={imageB.src}
           label={imageB.label}

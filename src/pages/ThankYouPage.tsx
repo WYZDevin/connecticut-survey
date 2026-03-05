@@ -13,6 +13,12 @@ function formatElapsed(ms: number): string {
   return `${seconds}s`;
 }
 
+const COMPARISON_LABELS = {
+  A: 'Left',
+  E: 'Equal',
+  B: 'Right',
+} as const;
+
 const FREQUENCY_LABELS: Record<number, string> = {
   0: 'Never',
   1: 'Almost never',
@@ -121,7 +127,7 @@ export default function ThankYouPage() {
                     <div key={key} className="ml-4">
                       <p className="font-medium">{cp.prompt}</p>
                       <p className="text-blue-600">
-                        {val ? `Image ${val}` : '\u2014'}
+                        {val ? COMPARISON_LABELS[val] : '\u2014'}
                       </p>
                     </div>
                   );
