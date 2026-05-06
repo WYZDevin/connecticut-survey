@@ -62,7 +62,7 @@ export const demographicQuestions: DemographicQuestion[] = [
 
 // --- Image pairs (randomized at runtime, generated one at a time) ---
 
-export const IMAGE_POOL_SIZE = 1000;
+export const IMAGE_POOL_SIZE = 464;
 
 function randomInt(max: number): number {
   return Math.floor(Math.random() * max) + 1;
@@ -77,8 +77,8 @@ export function generateRandomPair(index: number): ImagePair {
   }
   return {
     id: `comparison-${index + 1}`,
-    imageA: { src: `/svi/${idA}.jpg`, label: 'Left' },
-    imageB: { src: `/svi/${idB}.jpg`, label: 'Right' },
+    imageA: { src: `/svi_neus/${idA}.jpg`, label: 'Left' },
+    imageB: { src: `/svi_neus/${idB}.jpg`, label: 'Right' },
   };
 }
 
