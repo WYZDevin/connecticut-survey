@@ -80,10 +80,10 @@ export default function ThankYouPage() {
           <p className="text-sm text-gray-700">
             Email:{' '}
             <a
-              href="mailto:zhang.chen@uconn.edu"
+              href="mailto:hanlin.zhou@uconn.edu"
               className="text-blue-600 hover:underline"
             >
-              zhang.chen@uconn.edu
+              hanlin.zhou@uconn.edu
             </a>
           </p>
         </div>
