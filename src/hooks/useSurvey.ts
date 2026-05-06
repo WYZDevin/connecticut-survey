@@ -16,6 +16,7 @@ import { generateRandomPair } from '../data/questions';
 type SurveyAction =
   | { type: 'SET_IDENTIFIER'; value: string }
   | { type: 'SET_DEMOGRAPHIC'; questionId: string; value: string }
+  | { type: 'SET_CLIMATE'; questionId: string; value: number }
   | { type: 'SET_STRESS'; questionId: string; value: number }
   | {
       type: 'SET_COMPARISON';
@@ -32,6 +33,7 @@ function createInitialState(): SurveyState {
     identifierResponse: '',
     demographicResponses: {},
     comparisonResponses: {},
+    climateResponses: {},
     stressResponses: {},
     completed: false,
   };
@@ -46,6 +48,14 @@ function surveyReducer(state: SurveyState, action: SurveyAction): SurveyState {
         ...state,
         demographicResponses: {
           ...state.demographicResponses,
+          [action.questionId]: action.value,
+        },
+      };
+    case 'SET_CLIMATE':
+      return {
+        ...state,
+        climateResponses: {
+          ...state.climateResponses,
           [action.questionId]: action.value,
         },
       };
@@ -107,6 +117,10 @@ export function useSurvey() {
     dispatch({ type: 'SET_DEMOGRAPHIC', questionId, value });
   }
 
+  function setClimateResponse(questionId: string, value: number) {
+    dispatch({ type: 'SET_CLIMATE', questionId, value });
+  }
+
   function setStressResponse(questionId: string, value: number) {
     dispatch({ type: 'SET_STRESS', questionId, value });
   }
@@ -130,6 +144,7 @@ export function useSurvey() {
     state,
     setIdentifierResponse,
     setDemographicResponse,
+    setClimateResponse,
     setStressResponse,
     setComparisonResponse,
     addPair,

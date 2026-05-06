@@ -115,6 +115,29 @@ export const comparisonPrompts = [
   },
 ];
 
+// --- Section: Environmental Risks (Q4-Q6, asked between demographics and stress) ---
+
+export const climateRiskQuestions: (FrequencyQuestion | AgreementQuestion)[] = [
+  {
+    id: 'Q4',
+    type: 'agreement',
+    prompt:
+      'I believe that extreme weather events (such as heatwaves, floods, wildfires, and severe storms) will become more common or more severe in the years ahead.',
+  },
+  {
+    id: 'Q5',
+    type: 'agreement',
+    prompt:
+      'I am willing to change my daily habits or take steps to better prepare myself and my home for extreme weather and environmental hazards.',
+  },
+  {
+    id: 'Q6',
+    type: 'frequency',
+    prompt:
+      'In the past, how often have you or your household been directly affected by extreme weather events or environmental hazards (for example, floods, heatwaves, wildfires, severe storms, or poor air quality)?',
+  },
+];
+
 // --- Perceived Stress (Q10-Q14, asked once before comparisons) ---
 
 export const stressQuestions: (FrequencyQuestion | AgreementQuestion)[] = [

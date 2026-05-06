@@ -1,6 +1,7 @@
 import { useSurvey } from '../hooks/useSurvey';
 import {
   demographicQuestions,
+  climateRiskQuestions,
   stressQuestions,
   comparisonPrompts,
 } from '../data/questions';
@@ -43,6 +44,14 @@ export default function ThankYouPage() {
     const val = state.stressResponses[questionId];
     if (val === undefined) return '\u2014';
     const q = stressQuestions.find((sq) => sq.id === questionId);
+    if (q?.type === 'agreement') return AGREEMENT_LABELS[val] ?? String(val);
+    return FREQUENCY_LABELS[val] ?? String(val);
+  }
+
+  function formatClimateValue(questionId: string): string {
+    const val = state.climateResponses[questionId];
+    if (val === undefined) return '\u2014';
+    const q = climateRiskQuestions.find((cq) => cq.id === questionId);
     if (q?.type === 'agreement') return AGREEMENT_LABELS[val] ?? String(val);
     return FREQUENCY_LABELS[val] ?? String(val);
   }
@@ -97,6 +106,17 @@ export default function ThankYouPage() {
                 <p className="text-blue-600">
                   {state.demographicResponses[q.id] ?? '\u2014'}
                 </p>
+              </div>
+            ))}
+
+            {/* Environmental Risks */}
+            <h3 className="font-semibold text-gray-800 pt-2">
+              Environmental Risks
+            </h3>
+            {climateRiskQuestions.map((q) => (
+              <div key={q.id}>
+                <p className="font-medium">{q.prompt}</p>
+                <p className="text-blue-600">{formatClimateValue(q.id)}</p>
               </div>
             ))}
 

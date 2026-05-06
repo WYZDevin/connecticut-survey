@@ -89,6 +89,7 @@ export interface SurveyState {
   identifierResponse: string;
   demographicResponses: Record<string, string>;
   comparisonResponses: Record<string, ImageComparisonResponse>;
+  climateResponses: Record<string, number>;
   stressResponses: Record<string, number>;
   completed: boolean;
 }

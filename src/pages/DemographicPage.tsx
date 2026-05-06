@@ -30,7 +30,7 @@ export default function DemographicPage() {
           <div className="mt-8 flex justify-end">
             <button
               disabled={!allAnswered}
-              onClick={() => navigate('/survey/stress')}
+              onClick={() => navigate('/survey/climate')}
               className={`px-8 py-3 rounded-lg text-lg font-medium transition-colors ${
                 allAnswered
                   ? 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer'

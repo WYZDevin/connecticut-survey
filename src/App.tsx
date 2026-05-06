@@ -4,6 +4,7 @@ import SurveyTimer from './components/SurveyTimer';
 import WelcomePage from './pages/WelcomePage';
 import IdentifierPage from './pages/IdentifierPage';
 import DemographicPage from './pages/DemographicPage';
+import ClimateRiskPage from './pages/ClimateRiskPage';
 import StressPage from './pages/StressPage';
 import ImageComparisonPage from './pages/ImageComparisonPage';
 import ThankYouPage from './pages/ThankYouPage';
@@ -17,6 +18,7 @@ export default function App() {
           <Route path="/" element={<WelcomePage />} />
           <Route path="/survey/identifier" element={<IdentifierPage />} />
           <Route path="/survey/demographics" element={<DemographicPage />} />
+          <Route path="/survey/climate" element={<ClimateRiskPage />} />
           <Route path="/survey/stress" element={<StressPage />} />
           <Route
             path="/survey/comparison/:index"
