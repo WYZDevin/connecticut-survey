@@ -4,6 +4,7 @@ import type {
   ImagePair,
   FrequencyQuestion,
   AgreementQuestion,
+  LikertQuestion,
 } from '../types/survey';
 
 // --- Section 0: Identifier ---
@@ -117,24 +118,28 @@ export const comparisonPrompts = [
 
 // --- Section: Environmental Risks (Q4-Q6, asked between demographics and stress) ---
 
-export const climateRiskQuestions: (FrequencyQuestion | AgreementQuestion)[] = [
+export const climateRiskQuestions: (LikertQuestion | FrequencyQuestion)[] = [
   {
     id: 'Q4',
-    type: 'agreement',
+    type: 'likert',
     prompt:
-      'I believe that extreme weather events (such as heatwaves, floods, wildfires, and severe storms) will become more common or more severe in the years ahead.',
+      'How likely do you think environmental risks will become more frequent or severe in the years ahead?',
+    lowLabel: 'Not at all likely',
+    highLabel: 'Very likely',
   },
   {
     id: 'Q5',
-    type: 'agreement',
+    type: 'likert',
     prompt:
-      'I am willing to change my daily habits or take steps to better prepare myself and my home for extreme weather and environmental hazards.',
+      'How willing are you to change your habits to better prepare for environmental risks?',
+    lowLabel: 'Not at all willing',
+    highLabel: 'Very willing',
   },
   {
     id: 'Q6',
     type: 'frequency',
     prompt:
-      'In the past, how often have you or your household been directly affected by extreme weather events or environmental hazards (for example, floods, heatwaves, wildfires, severe storms, or poor air quality)?',
+      'How often have you been directly affected by environmental risks?',
   },
 ];
 

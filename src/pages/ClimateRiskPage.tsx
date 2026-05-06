@@ -2,8 +2,8 @@ import { useNavigate } from 'react-router-dom';
 import { useSurvey } from '../hooks/useSurvey';
 import { climateRiskQuestions } from '../data/questions';
 import FrequencyQuestion from '../components/FrequencyQuestion';
-import AgreementQuestion from '../components/AgreementQuestion';
-import type { FrequencyResponse, AgreementResponse } from '../types/survey';
+import LikertQuestion from '../components/LikertQuestion';
+import type { FrequencyResponse, LikertResponse } from '../types/survey';
 
 export default function ClimateRiskPage() {
   const navigate = useNavigate();
@@ -21,8 +21,8 @@ export default function ClimateRiskPage() {
             Section 2: Environmental Risks
           </h2>
           <p className="text-gray-500 mb-6">
-            The next questions ask about your views and experiences with
-            extreme weather and environmental hazards.
+            The following questions ask about your views and experience with
+            environmental risks, including floods, heatwaves, and wildfires.
           </p>
           {climateRiskQuestions.map((q) => {
             if (q.type === 'frequency') {
@@ -40,13 +40,13 @@ export default function ClimateRiskPage() {
               );
             }
             return (
-              <AgreementQuestion
+              <LikertQuestion
                 key={q.id}
                 prompt={q.prompt}
+                lowLabel={q.lowLabel}
+                highLabel={q.highLabel}
                 value={
-                  state.climateResponses[q.id] as
-                    | AgreementResponse
-                    | undefined
+                  state.climateResponses[q.id] as LikertResponse | undefined
                 }
                 onChange={(val) => setClimateResponse(q.id, val)}
               />

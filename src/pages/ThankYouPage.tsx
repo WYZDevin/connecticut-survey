@@ -52,8 +52,9 @@ export default function ThankYouPage() {
     const val = state.climateResponses[questionId];
     if (val === undefined) return '\u2014';
     const q = climateRiskQuestions.find((cq) => cq.id === questionId);
-    if (q?.type === 'agreement') return AGREEMENT_LABELS[val] ?? String(val);
-    return FREQUENCY_LABELS[val] ?? String(val);
+    if (q?.type === 'frequency') return FREQUENCY_LABELS[val] ?? String(val);
+    if (q?.type === 'likert') return `${val} / 5 (${q.lowLabel} \u2192 ${q.highLabel})`;
+    return String(val);
   }
 
   return (
