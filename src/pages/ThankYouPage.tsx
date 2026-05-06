@@ -6,14 +6,6 @@ import {
   comparisonPrompts,
 } from '../data/questions';
 
-function formatElapsed(ms: number): string {
-  const totalSeconds = Math.floor(ms / 1000);
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds % 60;
-  if (minutes > 0) return `${minutes}m ${seconds}s`;
-  return `${seconds}s`;
-}
-
 const COMPARISON_LABELS = {
   A: 'Left',
   E: 'Equal',
@@ -38,7 +30,6 @@ const AGREEMENT_LABELS: Record<number, string> = {
 
 export default function ThankYouPage() {
   const { state } = useSurvey();
-  const elapsed = Date.now() - state.startTime;
 
   function formatStressValue(questionId: string): string {
     const val = state.stressResponses[questionId];
@@ -62,12 +53,9 @@ export default function ThankYouPage() {
       <div className="max-w-lg w-full bg-white rounded-2xl shadow-lg p-8 text-center">
         <div className="text-5xl mb-4">&#10003;</div>
         <h1 className="text-3xl font-bold text-gray-900 mb-4">Thank You!</h1>
-        <p className="text-gray-600 mb-4 leading-relaxed">
+        <p className="text-gray-600 mb-6 leading-relaxed">
           Your responses have been recorded. Thank you for contributing to
           our research.
-        </p>
-        <p className="text-sm text-gray-500 mb-6">
-          You completed {state.imagePairs.length} comparison{state.imagePairs.length !== 1 ? 's' : ''} in {formatElapsed(elapsed)}.
         </p>
 
         <div className="bg-blue-50 rounded-lg p-5 mb-6 text-left">
