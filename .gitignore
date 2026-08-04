@@ -25,3 +25,19 @@ dist-ssr
 
 # Claude Code local session/memory data
 .claude/
+
+# Survey source data (6.9 GB) and legacy bundled image pools — never committed
+/svi/
+/public/svi/
+/public/svi_neus/
+
+# Backend
+backend/.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+backend/export/
+
+# Secrets
+.env
+.env.local
