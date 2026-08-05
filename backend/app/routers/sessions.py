@@ -1,6 +1,6 @@
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select, text
 from sqlalchemy.orm import Session
 
@@ -50,7 +50,6 @@ def create_session(db: Session = Depends(get_db)) -> SessionCreateResponse:
 def submit_survey(
     session_id: uuid.UUID,
     payload: SubmitRequest,
-    request: Request,
     db: Session = Depends(get_db),
 ) -> SubmitResponse:
     session = db.get(SurveySession, session_id)
@@ -97,7 +96,6 @@ def submit_survey(
             climate=payload.climate,
             stress=payload.stress,
             duration_seconds=payload.durationSeconds,
-            user_agent=request.headers.get("user-agent"),
         )
     )
     for c in payload.comparisons:
@@ -107,6 +105,7 @@ def submit_survey(
                 pair_id=c.pairId,
                 prompt_id=c.promptId,
                 choice=c.choice,
+                identifier=payload.identifier,
             )
         )
     db.execute(

@@ -135,7 +135,6 @@ CREATE TABLE submissions (
   climate               jsonb NOT NULL,      -- {"Q4": 3, ...}
   stress                jsonb NOT NULL,      -- {"Q10": 2, ...}
   duration_seconds      integer NOT NULL,
-  user_agent            text,
   submitted_at          timestamptz NOT NULL DEFAULT now()
 );
 
@@ -145,6 +144,7 @@ CREATE TABLE comparison_responses (
   pair_id    text NOT NULL REFERENCES pairs,
   prompt_id  text NOT NULL,   -- flood | heatwave | wildfire | crime | transport | noise
   choice     text NOT NULL,   -- 'left' | 'equal' | 'right'  (maps A/E/B; left == left_id, CSV order preserved)
+  identifier text NOT NULL DEFAULT '',  -- participant identifier, denormalized for analysis
   PRIMARY KEY (session_id, pair_id, prompt_id)
 );
 ```

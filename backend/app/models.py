@@ -63,7 +63,6 @@ class Submission(Base):
     climate: Mapped[dict] = mapped_column(JSONB)
     stress: Mapped[dict] = mapped_column(JSONB)
     duration_seconds: Mapped[int] = mapped_column(Integer)
-    user_agent: Mapped[str | None] = mapped_column(Text, nullable=True)
     submitted_at: Mapped[datetime] = mapped_column(
         TIMESTAMP(timezone=True), server_default=text("now()")
     )
@@ -78,3 +77,4 @@ class ComparisonResponse(Base):
     pair_id: Mapped[str] = mapped_column(ForeignKey("pairs.pair_id"), primary_key=True)
     prompt_id: Mapped[str] = mapped_column(Text, primary_key=True)
     choice: Mapped[str] = mapped_column(Text)
+    identifier: Mapped[str] = mapped_column(Text, server_default=text("''"))

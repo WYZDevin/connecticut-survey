@@ -21,11 +21,7 @@ def db_scalar(sql: str, **params):
 def test_submit_happy_path(client, seed_blocks):
     seed_blocks(1)
     sid, pair_ids = create_session(client)
-    res = client.post(
-        f"/api/sessions/{sid}/submit",
-        json=make_payload(pair_ids),
-        headers={"User-Agent": "pytest-agent"},
-    )
+    res = client.post(f"/api/sessions/{sid}/submit", json=make_payload(pair_ids))
     assert res.status_code == 201
     assert res.json() == {"ok": True}
     assert db_scalar("SELECT count(*) FROM submissions") == 1
@@ -36,9 +32,12 @@ def test_submit_happy_path(client, seed_blocks):
         is not None
     )
     assert db_scalar("SELECT submitted_count FROM blocks WHERE block_index = 0") == 1
+    # Every comparison row carries the participant's identifier.
     assert (
-        db_scalar("SELECT user_agent FROM submissions WHERE session_id = :sid", sid=sid)
-        == "pytest-agent"
+        db_scalar(
+            "SELECT count(*) FROM comparison_responses WHERE identifier = 'test@example.com'"
+        )
+        == CELLS
     )
 
 

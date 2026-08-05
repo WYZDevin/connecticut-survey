@@ -25,7 +25,7 @@ SUBMISSIONS_SQL = text(
     """
     SELECT s.id AS session_id, s.block_index, s.created_at, s.submitted_at,
            sub.consent_initials, sub.payment_optout_initials, sub.identifier,
-           sub.survey_phase, sub.duration_seconds, sub.user_agent,
+           sub.survey_phase, sub.duration_seconds,
            sub.demographic, sub.climate, sub.stress
     FROM sessions s
     JOIN submissions sub ON sub.session_id = s.id
@@ -36,7 +36,7 @@ SUBMISSIONS_SQL = text(
 
 COMPARISONS_SQL = text(
     """
-    SELECT cr.session_id, cr.pair_id, cr.prompt_id, cr.choice,
+    SELECT cr.session_id, cr.identifier, cr.pair_id, cr.prompt_id, cr.choice,
            p.left_image, p.right_image, s.submitted_at
     FROM comparison_responses cr
     JOIN pairs p ON p.pair_id = cr.pair_id
@@ -107,7 +107,7 @@ def main() -> None:
                 [
                     "session_id", "block_index", "created_at", "submitted_at",
                     "consent_initials", "payment_optout_initials", "identifier",
-                    "survey_phase", "duration_seconds", "user_agent", *question_ids,
+                    "survey_phase", "duration_seconds", *question_ids,
                 ]
             )
             for r in rows:
@@ -117,7 +117,7 @@ def main() -> None:
                         r["session_id"], r["block_index"], r["created_at"],
                         r["submitted_at"], r["consent_initials"],
                         r["payment_optout_initials"], r["identifier"],
-                        r["survey_phase"], r["duration_seconds"], r["user_agent"],
+                        r["survey_phase"], r["duration_seconds"],
                         *[answers.get(q, "") for q in question_ids],
                     ]
                 )
@@ -128,15 +128,16 @@ def main() -> None:
             writer = csv.writer(fh)
             writer.writerow(
                 [
-                    "session_id", "pair_id", "prompt_id", "choice",
+                    "session_id", "identifier", "pair_id", "prompt_id", "choice",
                     "left_image", "right_image", "submitted_at",
                 ]
             )
             for r in comp_rows:
                 writer.writerow(
                     [
-                        r["session_id"], r["pair_id"], r["prompt_id"], r["choice"],
-                        r["left_image"], r["right_image"], r["submitted_at"],
+                        r["session_id"], r["identifier"], r["pair_id"],
+                        r["prompt_id"], r["choice"], r["left_image"],
+                        r["right_image"], r["submitted_at"],
                     ]
                 )
 
