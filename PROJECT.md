@@ -15,7 +15,7 @@ compare pairs of street-view images and answer short questionnaires. Current flo
 /            ConsentPage      — consent form, initials, agree to participate
 /welcome     WelcomePage
 /survey/identifier            — email (phase 1) or Prolific ID (phase 2), see src/data/config.ts
-/survey/comparison/:index     — image-pair comparisons (currently 20 random pairs; becomes 10 assigned pairs)
+/survey/comparison/:index     — image-pair comparisons (currently 20 random pairs; becomes 20 assigned pairs)
 /survey/demographics          — Q1–Q3 single-choice
 /survey/climate               — Q4–Q6 environmental-risk questions
 /survey/stress                — Q10–Q14 perceived stress (Q14 is an attention check)
@@ -42,7 +42,7 @@ pairing list**, and **persist all survey responses** in a database.
 - **Important**: CSV IDs have no file extension. The folder mixes `.jpg` and
   `.png` (of the 200 currently referenced: 182 jpg, 18 png). Extension
   resolution happens once at ingest time; the DB stores full filenames.
-- Each participant receives **10 pairs** when they agree to the consent form.
+- Each participant receives **20 pairs** when they agree to the consent form.
 - All responses (consent initials, identifier, comparisons, demographics,
   climate, stress, timing) are saved to the backend database.
 
@@ -55,7 +55,7 @@ pairing list**, and **persist all survey responses** in a database.
 | Backend hosting | **Azure** (App Service for Linux recommended) |
 | Frontend hosting | **Vercel** (separate origin → CORS required) |
 | Image hosting | **Azure Blob Storage**, public-read container (see §7) |
-| Pair assignment | **Sequential blocks**: block *k* = CSV rows `10k … 10k+9` (100 blocks/cycle) |
+| Pair assignment | **Sequential blocks**: block *k* = CSV rows `20k … 20k+19` (50 blocks/cycle) |
 | Abandonment handling | **Assignment + expiry**: a claimed block is reserved; if no submission arrives within the TTL (default 60 min, configurable), the reservation expires and the block becomes claimable again |
 | Save timing | **Single submit at the end** — one POST containing the entire survey; no incremental saves |
 | Left/right display | **Keep CSV order** — `left_id` always renders on the left; no per-participant flipping |
@@ -100,14 +100,14 @@ backend/
 CREATE TABLE pairs (
   pair_id     text PRIMARY KEY,        -- e.g. 'pioneer_pair_000001'
   csv_index   integer NOT NULL UNIQUE, -- 0-based row order in the CSV
-  block_index integer NOT NULL,        -- csv_index / 10
+  block_index integer NOT NULL,        -- csv_index / 20
   left_image  text NOT NULL,           -- full filename incl. extension, e.g. '44005040102_02.jpg'
   right_image text NOT NULL,
   source_csv  text NOT NULL            -- 'streetview_pairings_pioneer_50.csv' (future rounds append)
 );
 CREATE INDEX ON pairs (block_index);
 
--- One row per block; the claimable unit. Populated by ingest (block 0..99).
+-- One row per block; the claimable unit. Populated by ingest (block 0..49).
 CREATE TABLE blocks (
   block_index     integer PRIMARY KEY,
   submitted_count integer NOT NULL DEFAULT 0   -- completed submissions across all cycles
@@ -139,7 +139,7 @@ CREATE TABLE submissions (
   submitted_at          timestamptz NOT NULL DEFAULT now()
 );
 
--- One row per (pair × prompt) judgment. 10 pairs × 6 prompts = 60 rows/submission.
+-- One row per (pair × prompt) judgment. 20 pairs × 6 prompts = 120 rows/submission.
 CREATE TABLE comparison_responses (
   session_id uuid NOT NULL REFERENCES sessions,
   pair_id    text NOT NULL REFERENCES pairs,
@@ -180,7 +180,7 @@ consent page). All inside one transaction:
    FOR UPDATE OF b SKIP LOCKED;
    ```
 3. Insert the session row (`expires_at = now() + TTL`).
-4. Return session id + the block's 10 pairs (ordered by `csv_index`) with full
+4. Return session id + the block's 20 pairs (ordered by `csv_index`) with full
    image URLs.
 
 On submit, set `status='submitted'`, increment `blocks.submitted_count`. A
@@ -228,7 +228,7 @@ Response `201`:
       "leftImageUrl": "https://…/svi/44005040102_02.jpg",
       "rightImageUrl": "https://…/svi/25017383902_02.jpg"
     }
-    // exactly 10, in csv_index order
+    // exactly 20, in csv_index order
   ]
 }
 ```
@@ -247,12 +247,12 @@ Body (mirrors `SurveyState`, keyed by real IDs):
   "durationSeconds": 812,
   "comparisons": [
     {"pairId": "pioneer_pair_000011", "promptId": "flood", "choice": "left"}
-    // 60 entries: 10 pairs × 6 prompts
+    // 120 entries: 20 pairs × 6 prompts
   ]
 }
 ```
 Validation: session exists and is not already `submitted` (409 on double
-submit); every `pairId` belongs to the session's block; all 60 (pair, prompt)
+submit); every `pairId` belongs to the session's block; all 120 (pair, prompt)
 cells present; `choice ∈ {left, equal, right}`; `promptId` in the known set.
 Accept even if the session is `expired` (see §6). Response `201 {"ok": true}`.
 
@@ -271,7 +271,7 @@ The script is required either way (§10); the endpoint is optional.
    use a Vite dev proxy for `/api` → `http://localhost:8000`).
 2. **Types/state** (`src/types/survey.ts`, `src/hooks/useSurvey.ts`):
    - `ImagePair` gains `pairId`; `src` fields come from the API.
-   - `SurveyState` gains `sessionId: string | null` and holds the 10 assigned
+   - `SurveyState` gains `sessionId: string | null` and holds the 20 assigned
      pairs; remove `generateRandomPair` usage and `ADD_PAIR` incremental logic
      (`SET_SESSION` action sets sessionId + all pairs at once).
 3. **ConsentPage**: on Agree, call `createSession()`; store sessionId + pairs;

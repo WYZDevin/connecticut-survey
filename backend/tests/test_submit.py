@@ -1,8 +1,11 @@
 from sqlalchemy import text
 
+from app.constants import PAIRS_PER_BLOCK, PROMPT_IDS
 from app.db import SessionLocal
 from tests.conftest import make_payload
 from tests.test_assignment import backdate
+
+CELLS = PAIRS_PER_BLOCK * len(PROMPT_IDS)
 
 
 def create_session(client) -> tuple[str, list[str]]:
@@ -26,7 +29,7 @@ def test_submit_happy_path(client, seed_blocks):
     assert res.status_code == 201
     assert res.json() == {"ok": True}
     assert db_scalar("SELECT count(*) FROM submissions") == 1
-    assert db_scalar("SELECT count(*) FROM comparison_responses") == 60
+    assert db_scalar("SELECT count(*) FROM comparison_responses") == CELLS
     assert db_scalar("SELECT status FROM sessions WHERE id = :sid", sid=sid) == "submitted"
     assert (
         db_scalar("SELECT submitted_at FROM sessions WHERE id = :sid", sid=sid)
@@ -68,7 +71,7 @@ def test_malformed_uuid_422(client, seed_blocks):
 def test_pair_not_in_block_422(client, seed_blocks):
     seed_blocks(2)
     sid, pair_ids = create_session(client)
-    wrong = pair_ids[:-1] + ["p0015"]  # a block-1 pair
+    wrong = pair_ids[:-1] + [f"p{PAIRS_PER_BLOCK + 5:04d}"]  # a block-1 pair
     res = client.post(f"/api/sessions/{sid}/submit", json=make_payload(wrong))
     assert res.status_code == 422
     assert db_scalar("SELECT count(*) FROM submissions") == 0

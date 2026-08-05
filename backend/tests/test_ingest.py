@@ -1,6 +1,7 @@
 import pytest
 from sqlalchemy import select, text
 
+from app.constants import PAIRS_PER_BLOCK
 from app.db import SessionLocal
 from app.models import Block, Pair
 from scripts.ingest_pairs import build_filename_index, read_pairs, upsert
@@ -54,14 +55,18 @@ def test_ambiguous_id_aborts(tmp_path):
 
 
 def test_ingest_idempotent_preserves_submitted_count(tmp_path):
+    n_rows = 2 * PAIRS_PER_BLOCK
     names = [f"i{n}.jpg" for n in range(4)]
     make_images(tmp_path, names)
     csv_path = tmp_path / "pairs.csv"
-    write_csv(csv_path, [(f"pair_{n}", f"i{n % 4}", f"i{(n + 1) % 4}") for n in range(20)])
+    write_csv(
+        csv_path,
+        [(f"pair_{n}", f"i{n % 4}", f"i{(n + 1) % 4}") for n in range(n_rows)],
+    )
 
     index, ambiguous = build_filename_index(tmp_path)
     rows = read_pairs(csv_path, index, ambiguous)
-    assert len(rows) == 20
+    assert len(rows) == n_rows
 
     with SessionLocal() as db:
         upsert(db, rows, "pairs.csv")
@@ -74,6 +79,35 @@ def test_ingest_idempotent_preserves_submitted_count(tmp_path):
 
         pairs = db.execute(select(Pair)).scalars().all()
         blocks = db.execute(select(Block).order_by(Block.block_index)).scalars().all()
-        assert len(pairs) == 20
+        assert len(pairs) == n_rows
         assert [b.block_index for b in blocks] == [0, 1]
         assert blocks[0].submitted_count == 7
+
+
+def test_reingest_smaller_set_removes_stale_pairless_blocks(tmp_path):
+    names = [f"i{n}.jpg" for n in range(4)]
+    make_images(tmp_path, names)
+    big_csv = tmp_path / "big.csv"
+    write_csv(
+        big_csv,
+        [(f"pair_{n}", f"i{n % 4}", f"i{(n + 1) % 4}") for n in range(2 * PAIRS_PER_BLOCK)],
+    )
+    small_csv = tmp_path / "small.csv"
+    write_csv(
+        small_csv,
+        [(f"pair_{n}", f"i{n % 4}", f"i{(n + 1) % 4}") for n in range(PAIRS_PER_BLOCK)],
+    )
+
+    index, ambiguous = build_filename_index(tmp_path)
+    with SessionLocal() as db:
+        upsert(db, read_pairs(big_csv, index, ambiguous), "big.csv")
+        db.commit()
+        # Shrinking to one block re-chunks every pair into block 0; the DELETE
+        # for stale pairs isn't ingest's job (pair_1x rows keep block 0 here),
+        # but block 1 loses all pairs and must go.
+        db.execute(text(f"DELETE FROM pairs WHERE csv_index >= {PAIRS_PER_BLOCK}"))
+        db.commit()
+        upsert(db, read_pairs(small_csv, index, ambiguous), "small.csv")
+        db.commit()
+        blocks = db.execute(select(Block).order_by(Block.block_index)).scalars().all()
+        assert [b.block_index for b in blocks] == [0]

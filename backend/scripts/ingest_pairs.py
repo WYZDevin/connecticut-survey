@@ -15,7 +15,7 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
-from sqlalchemy import create_engine, func, select
+from sqlalchemy import create_engine, func, select, text
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.orm import Session
 
@@ -115,6 +115,19 @@ def upsert(db: Session, rows: list[PairRow], source_name: str) -> None:
     ]
     # DO NOTHING: never reset submitted_count on re-ingest
     db.execute(pg_insert(Block).values(block_values).on_conflict_do_nothing())
+    # A block-size change re-chunks pairs and can strand old block rows with no
+    # pairs. Remove them — unless sessions reference them (kept for history;
+    # the claim query already skips pairless blocks).
+    stale = db.execute(
+        text(
+            "DELETE FROM blocks b "
+            "WHERE NOT EXISTS (SELECT 1 FROM pairs p WHERE p.block_index = b.block_index) "
+            "AND NOT EXISTS (SELECT 1 FROM sessions s WHERE s.block_index = b.block_index) "
+            "RETURNING b.block_index"
+        )
+    ).all()
+    if stale:
+        print(f"Removed {len(stale)} stale pairless blocks")
 
 
 def upload_images(image_dir: Path, filenames: set[str]) -> tuple[int, int]:

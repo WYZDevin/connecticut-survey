@@ -1,6 +1,7 @@
 from sqlalchemy import text
 
 from app.assignment import claim_block
+from app.constants import PAIRS_PER_BLOCK
 from app.db import SessionLocal
 from tests.conftest import block_of_response, make_payload
 
@@ -24,7 +25,7 @@ def test_sequential_claims_get_blocks_in_order(client, seed_blocks):
         res = client.post("/api/sessions")
         assert res.status_code == 201
         body = res.json()
-        assert len(body["pairs"]) == 10
+        assert len(body["pairs"]) == PAIRS_PER_BLOCK
         pair_ids = [p["pairId"] for p in body["pairs"]]
         assert pair_ids == sorted(pair_ids)  # csv_index order
         for p in body["pairs"]:

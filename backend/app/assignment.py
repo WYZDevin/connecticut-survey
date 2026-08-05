@@ -21,6 +21,7 @@ CLAIM_SQL = text(
       FROM sessions s
       WHERE s.block_index = b.block_index AND s.status = 'assigned'
     ) a ON true
+    WHERE EXISTS (SELECT 1 FROM pairs p WHERE p.block_index = b.block_index)
     ORDER BY b.submitted_count + a.active, b.block_index
     LIMIT 1
     FOR UPDATE OF b SKIP LOCKED
