@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useSurvey } from '../hooks/useSurvey';
 import {
   demographicQuestions,
@@ -5,6 +6,9 @@ import {
   stressQuestions,
   comparisonPrompts,
 } from '../data/questions';
+import { PROLIFIC_COMPLETION_URL } from '../data/config';
+
+const REDIRECT_DELAY_MS = 5000;
 
 const COMPARISON_LABELS = {
   A: 'Left',
@@ -30,6 +34,16 @@ const AGREEMENT_LABELS: Record<number, string> = {
 
 export default function ThankYouPage() {
   const { state } = useSurvey();
+
+  // Only a completed survey (successful submit) returns to Prolific;
+  // a stray visit to /thank-you does not.
+  useEffect(() => {
+    if (!state.completed) return;
+    const timer = setTimeout(() => {
+      window.location.replace(PROLIFIC_COMPLETION_URL);
+    }, REDIRECT_DELAY_MS);
+    return () => clearTimeout(timer);
+  }, [state.completed]);
 
   function formatStressValue(questionId: string): string {
     const val = state.stressResponses[questionId];
@@ -57,6 +71,25 @@ export default function ThankYouPage() {
           Your responses have been recorded. Thank you for contributing to
           our research.
         </p>
+
+        {state.completed && (
+          <div className="bg-green-50 border border-green-200 rounded-lg p-5 mb-6">
+            <p className="text-gray-700 mb-3">
+              You will be returned to Prolific in a few seconds to register
+              your completion.
+            </p>
+            <a
+              href={PROLIFIC_COMPLETION_URL}
+              className="inline-block px-6 py-2.5 rounded-lg bg-green-600 text-white font-medium hover:bg-green-700"
+            >
+              Return to Prolific now
+            </a>
+            <p className="text-xs text-gray-500 mt-3">
+              If you are not redirected, use the button above. Completion
+              code: C16Y04R2
+            </p>
+          </div>
+        )}
 
         <div className="bg-blue-50 rounded-lg p-5 mb-6 text-left">
           <h2 className="text-lg font-semibold text-gray-800 mb-3">
