@@ -4,16 +4,16 @@ export default function WelcomePage() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+    <div className="flex-1 flex items-center justify-center p-4">
       <div className="max-w-lg w-full bg-white rounded-2xl shadow-lg p-8 text-center">
         <h1 className="text-3xl font-bold text-gray-900 mb-4">
           Environmental Risk Perception in New England
         </h1>
         <p className="text-gray-600 mb-8 leading-relaxed">
           Thank you for participating in this research study. This survey will
-          ask you about your background, then show you pairs of street view
-          images and ask questions about environmental risk and perceived stress.
-          It should take about 10-15 minutes to complete.
+          show you pairs of street view images and ask questions about
+          environmental risk, then ask you about your background and perceived
+          stress. It should take about 10-15 minutes to complete.
         </p>
         <button
           onClick={() => navigate('/survey/identifier')}

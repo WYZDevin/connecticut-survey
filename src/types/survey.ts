@@ -78,6 +78,7 @@ export interface MultiChoiceResponseValue {
 // --- State ---
 
 export interface ImagePair {
+  /** The backend pair_id (e.g. 'pioneer_pair_000011'). */
   id: string;
   imageA: { src: string; label: string };
   imageB: { src: string; label: string };
@@ -85,7 +86,10 @@ export interface ImagePair {
 
 export interface SurveyState {
   startTime: number;
+  sessionId: string | null;
   imagePairs: ImagePair[];
+  consentInitials: string;
+  paymentOptOutInitials: string;
   identifierResponse: string;
   demographicResponses: Record<string, string>;
   comparisonResponses: Record<string, ImageComparisonResponse>;

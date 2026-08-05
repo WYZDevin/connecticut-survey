@@ -1,22 +1,23 @@
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Navigate } from 'react-router-dom';
 import { useSurvey } from '../hooks/useSurvey';
-import { generateRandomPair, comparisonPrompts } from '../data/questions';
+import { comparisonPrompts } from '../data/questions';
 import type { ImageComparisonResponse } from '../types/survey';
-
-const MAX_COMPARISONS = 20;
 
 export default function ImageComparisonPage() {
   const { index } = useParams<{ index: string }>();
   const navigate = useNavigate();
-  const { state, setComparisonResponse, addPair, completeSurvey } = useSurvey();
+  const { state, setComparisonResponse } = useSurvey();
 
+  const maxComparisons = state.imagePairs.length;
   const idx = Number(index);
   const pair = state.imagePairs[idx];
 
-  if (!pair || idx >= MAX_COMPARISONS) {
-    completeSurvey();
-    navigate('/thank-you', { replace: true });
-    return null;
+  // No session (page refresh or direct deep link): restart from consent.
+  if (maxComparisons === 0) {
+    return <Navigate to="/" replace />;
+  }
+  if (!Number.isInteger(idx) || idx < 0 || idx >= maxComparisons || !pair) {
+    return <Navigate to="/survey/demographics" replace />;
   }
 
   function responseKey(promptId: string) {
@@ -27,26 +28,21 @@ export default function ImageComparisonPage() {
     (p) => state.comparisonResponses[responseKey(p.id)] !== undefined,
   );
 
-  const isLast = idx === MAX_COMPARISONS - 1;
+  const isLast = idx === maxComparisons - 1;
 
   function handleNext() {
     if (isLast) {
-      completeSurvey();
-      navigate('/thank-you');
+      navigate('/survey/demographics');
       return;
     }
-    const nextIdx = idx + 1;
-    if (!state.imagePairs[nextIdx]) {
-      addPair(generateRandomPair(nextIdx));
-    }
-    navigate(`/survey/comparison/${nextIdx}`);
+    navigate(`/survey/comparison/${idx + 1}`);
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-3">
+    <div className="flex-1 p-3">
       <div className="max-w-3xl mx-auto mt-4">
         <div className="mb-3 text-sm text-gray-500">
-          Comparison {idx + 1} of {MAX_COMPARISONS}
+          Comparison {idx + 1} of {maxComparisons}
         </div>
         <div className="bg-white rounded-2xl shadow-lg p-5">
           <h2 className="text-xl font-bold text-gray-900 mb-4">
@@ -117,7 +113,7 @@ export default function ImageComparisonPage() {
                   : 'bg-gray-300 text-gray-500 cursor-not-allowed'
               }`}
             >
-              {isLast ? 'Finish Survey' : 'Next Comparison'}
+              {isLast ? 'Continue to Questionnaire' : 'Next Comparison'}
             </button>
           </div>
         </div>

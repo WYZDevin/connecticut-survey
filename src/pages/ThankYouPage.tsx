@@ -49,7 +49,7 @@ export default function ThankYouPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+    <div className="flex-1 flex items-center justify-center p-4">
       <div className="max-w-lg w-full bg-white rounded-2xl shadow-lg p-8 text-center">
         <div className="text-5xl mb-4">&#10003;</div>
         <h1 className="text-3xl font-bold text-gray-900 mb-4">Thank You!</h1>
@@ -81,11 +81,44 @@ export default function ThankYouPage() {
             View your responses
           </summary>
           <div className="mt-4 space-y-3 text-sm text-gray-600">
+            {/* Consent */}
+            <h3 className="font-semibold text-gray-800">Consent</h3>
+            <p className="text-blue-600">
+              Initials: {state.consentInitials || '\u2014'}
+              {state.paymentOptOutInitials
+                ? ` (declined payment: ${state.paymentOptOutInitials})`
+                : ''}
+            </p>
+
             {/* Identifier */}
-            <h3 className="font-semibold text-gray-800">Identifier</h3>
+            <h3 className="font-semibold text-gray-800 pt-2">Identifier</h3>
             <p className="text-blue-600">
               {state.identifierResponse || '\u2014'}
             </p>
+
+            {/* Comparisons */}
+            <h3 className="font-semibold text-gray-800 pt-2">
+              Image Comparisons
+            </h3>
+            {state.imagePairs.map((pair, pairIdx) => (
+              <div key={pair.id} className="border-t border-gray-200 pt-2">
+                <p className="font-semibold text-gray-700">
+                  Pair {pairIdx + 1}: {pair.imageA.src} vs {pair.imageB.src}
+                </p>
+                {comparisonPrompts.map((cp) => {
+                  const key = `${pair.id}-${cp.id}`;
+                  const val = state.comparisonResponses[key];
+                  return (
+                    <div key={key} className="ml-4">
+                      <p className="font-medium">{cp.prompt}</p>
+                      <p className="text-blue-600">
+                        {val ? COMPARISON_LABELS[val] : '\u2014'}
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
+            ))}
 
             {/* Demographics */}
             <h3 className="font-semibold text-gray-800 pt-2">Demographics</h3>
@@ -117,30 +150,6 @@ export default function ThankYouPage() {
               <div key={q.id}>
                 <p className="font-medium">{q.prompt}</p>
                 <p className="text-blue-600">{formatStressValue(q.id)}</p>
-              </div>
-            ))}
-
-            {/* Comparisons */}
-            <h3 className="font-semibold text-gray-800 pt-2">
-              Image Comparisons
-            </h3>
-            {state.imagePairs.map((pair, pairIdx) => (
-              <div key={pair.id} className="border-t border-gray-200 pt-2">
-                <p className="font-semibold text-gray-700">
-                  Pair {pairIdx + 1}: {pair.imageA.src} vs {pair.imageB.src}
-                </p>
-                {comparisonPrompts.map((cp) => {
-                  const key = `${pair.id}-${cp.id}`;
-                  const val = state.comparisonResponses[key];
-                  return (
-                    <div key={key} className="ml-4">
-                      <p className="font-medium">{cp.prompt}</p>
-                      <p className="text-blue-600">
-                        {val ? COMPARISON_LABELS[val] : '\u2014'}
-                      </p>
-                    </div>
-                  );
-                })}
               </div>
             ))}
           </div>

@@ -11,9 +11,10 @@ import type {
   ImagePair,
   ImageComparisonResponse,
 } from '../types/survey';
-import { generateRandomPair } from '../data/questions';
 
 type SurveyAction =
+  | { type: 'SET_CONSENT_INITIALS'; value: string }
+  | { type: 'SET_PAYMENT_OPTOUT_INITIALS'; value: string }
   | { type: 'SET_IDENTIFIER'; value: string }
   | { type: 'SET_DEMOGRAPHIC'; questionId: string; value: string }
   | { type: 'SET_CLIMATE'; questionId: string; value: number }
@@ -23,13 +24,16 @@ type SurveyAction =
       questionId: string;
       value: ImageComparisonResponse;
     }
-  | { type: 'ADD_PAIR'; pair: ImagePair }
+  | { type: 'SET_SESSION'; sessionId: string; pairs: ImagePair[] }
   | { type: 'COMPLETE' };
 
 function createInitialState(): SurveyState {
   return {
     startTime: Date.now(),
-    imagePairs: [generateRandomPair(0)],
+    sessionId: null,
+    imagePairs: [],
+    consentInitials: '',
+    paymentOptOutInitials: '',
     identifierResponse: '',
     demographicResponses: {},
     comparisonResponses: {},
@@ -41,6 +45,10 @@ function createInitialState(): SurveyState {
 
 function surveyReducer(state: SurveyState, action: SurveyAction): SurveyState {
   switch (action.type) {
+    case 'SET_CONSENT_INITIALS':
+      return { ...state, consentInitials: action.value };
+    case 'SET_PAYMENT_OPTOUT_INITIALS':
+      return { ...state, paymentOptOutInitials: action.value };
     case 'SET_IDENTIFIER':
       return { ...state, identifierResponse: action.value };
     case 'SET_DEMOGRAPHIC':
@@ -75,10 +83,11 @@ function surveyReducer(state: SurveyState, action: SurveyAction): SurveyState {
           [action.questionId]: action.value,
         },
       };
-    case 'ADD_PAIR':
+    case 'SET_SESSION':
       return {
         ...state,
-        imagePairs: [...state.imagePairs, action.pair],
+        sessionId: action.sessionId,
+        imagePairs: action.pairs,
       };
     case 'COMPLETE':
       return { ...state, completed: true };
@@ -109,6 +118,14 @@ export function useSurvey() {
 
   const { state, dispatch } = context;
 
+  function setConsentInitials(value: string) {
+    dispatch({ type: 'SET_CONSENT_INITIALS', value });
+  }
+
+  function setPaymentOptOutInitials(value: string) {
+    dispatch({ type: 'SET_PAYMENT_OPTOUT_INITIALS', value });
+  }
+
   function setIdentifierResponse(value: string) {
     dispatch({ type: 'SET_IDENTIFIER', value });
   }
@@ -132,8 +149,8 @@ export function useSurvey() {
     dispatch({ type: 'SET_COMPARISON', questionId, value });
   }
 
-  function addPair(pair: ImagePair) {
-    dispatch({ type: 'ADD_PAIR', pair });
+  function setSession(sessionId: string, pairs: ImagePair[]) {
+    dispatch({ type: 'SET_SESSION', sessionId, pairs });
   }
 
   function completeSurvey() {
@@ -142,12 +159,14 @@ export function useSurvey() {
 
   return {
     state,
+    setConsentInitials,
+    setPaymentOptOutInitials,
     setIdentifierResponse,
     setDemographicResponse,
     setClimateResponse,
     setStressResponse,
     setComparisonResponse,
-    addPair,
+    setSession,
     completeSurvey,
   };
 }

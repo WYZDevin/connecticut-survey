@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { SurveyProvider } from './hooks/useSurvey';
 import SurveyTimer from './components/SurveyTimer';
+import SiteHeader from './components/SiteHeader';
+import ConsentPage from './pages/ConsentPage';
 import WelcomePage from './pages/WelcomePage';
 import IdentifierPage from './pages/IdentifierPage';
 import DemographicPage from './pages/DemographicPage';
@@ -14,18 +16,24 @@ export default function App() {
     <BrowserRouter>
       <SurveyProvider>
         <SurveyTimer />
-        <Routes>
-          <Route path="/" element={<WelcomePage />} />
-          <Route path="/survey/identifier" element={<IdentifierPage />} />
-          <Route path="/survey/demographics" element={<DemographicPage />} />
-          <Route path="/survey/climate" element={<ClimateRiskPage />} />
-          <Route path="/survey/stress" element={<StressPage />} />
-          <Route
-            path="/survey/comparison/:index"
-            element={<ImageComparisonPage />}
-          />
-          <Route path="/thank-you" element={<ThankYouPage />} />
-        </Routes>
+        <div className="min-h-screen bg-gray-50 flex flex-col">
+          <SiteHeader />
+          <main className="flex-1 flex flex-col">
+            <Routes>
+              <Route path="/" element={<ConsentPage />} />
+              <Route path="/welcome" element={<WelcomePage />} />
+              <Route path="/survey/identifier" element={<IdentifierPage />} />
+              <Route
+                path="/survey/comparison/:index"
+                element={<ImageComparisonPage />}
+              />
+              <Route path="/survey/demographics" element={<DemographicPage />} />
+              <Route path="/survey/climate" element={<ClimateRiskPage />} />
+              <Route path="/survey/stress" element={<StressPage />} />
+              <Route path="/thank-you" element={<ThankYouPage />} />
+            </Routes>
+          </main>
+        </div>
       </SurveyProvider>
     </BrowserRouter>
   );

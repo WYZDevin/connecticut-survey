@@ -1,7 +1,6 @@
 import type {
   TextInputQuestion,
   DemographicQuestion,
-  ImagePair,
   FrequencyQuestion,
   AgreementQuestion,
   LikertQuestion,
@@ -60,29 +59,7 @@ export const demographicQuestions: DemographicQuestion[] = [
   },
 ];
 
-// --- Image pairs (randomized at runtime, generated one at a time) ---
-
-export const IMAGE_POOL_SIZE = 1000;
-
-function randomInt(max: number): number {
-  return Math.floor(Math.random() * max) + 1;
-}
-
-/** Generate a single random image pair with two distinct images. */
-export function generateRandomPair(index: number): ImagePair {
-  const idA = randomInt(IMAGE_POOL_SIZE);
-  let idB = randomInt(IMAGE_POOL_SIZE);
-  while (idB === idA) {
-    idB = randomInt(IMAGE_POOL_SIZE);
-  }
-  return {
-    id: `comparison-${index + 1}`,
-    imageA: { src: `/svi/${idA}.jpg`, label: 'Left' },
-    imageB: { src: `/svi/${idB}.jpg`, label: 'Right' },
-  };
-}
-
-// --- Comparison prompts (3 questions per image pair) ---
+// --- Comparison prompts (asked for each server-assigned image pair) ---
 
 export const comparisonPrompts = [
   {
