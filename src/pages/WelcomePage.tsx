@@ -16,7 +16,7 @@ export default function WelcomePage() {
           stress. It should take about 10-15 minutes to complete.
         </p>
         <button
-          onClick={() => navigate('/survey/identifier')}
+          onClick={() => navigate('/survey/comparison/0')}
           className="bg-blue-600 text-white px-8 py-3 rounded-lg text-lg font-medium hover:bg-blue-700 transition-colors cursor-pointer"
         >
           Begin Survey

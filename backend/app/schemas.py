@@ -24,7 +24,8 @@ class ComparisonIn(BaseModel):
 
 
 class SubmitRequest(BaseModel):
-    consentInitials: str = Field(min_length=1, max_length=20)
+    # Consent is signified by clicking "I agree"; no initials are collected.
+    consentInitials: str = Field(default="", max_length=20)
     paymentOptOutInitials: str = Field(default="", max_length=20)
     identifier: str = Field(min_length=1, max_length=200)
     surveyPhase: int

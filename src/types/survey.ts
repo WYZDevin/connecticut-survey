@@ -88,7 +88,6 @@ export interface SurveyState {
   startTime: number;
   sessionId: string | null;
   imagePairs: ImagePair[];
-  consentInitials: string;
   paymentOptOutInitials: string;
   identifierResponse: string;
   demographicResponses: Record<string, string>;

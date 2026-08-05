@@ -12,9 +12,9 @@ compare pairs of street-view images and answer short questionnaires. Current flo
 (all client-side, React SPA):
 
 ```
-/            ConsentPage      — consent form, initials, agree to participate
+/            ConsentPage      — consent form; clicking "I agree" is the signature (no initials)
+/survey/identifier            — first question: email (phase 1) or Prolific ID (phase 2), see src/data/config.ts
 /welcome     WelcomePage
-/survey/identifier            — email (phase 1) or Prolific ID (phase 2), see src/data/config.ts
 /survey/comparison/:index     — image-pair comparisons (currently 20 random pairs; becomes 20 assigned pairs)
 /survey/demographics          — Q1–Q3 single-choice
 /survey/climate               — Q4–Q6 environmental-risk questions
@@ -43,8 +43,10 @@ pairing list**, and **persist all survey responses** in a database.
   `.png` (of the 200 currently referenced: 182 jpg, 18 png). Extension
   resolution happens once at ingest time; the DB stores full filenames.
 - Each participant receives **20 pairs** when they agree to the consent form.
-- All responses (consent initials, identifier, comparisons, demographics,
-  climate, stress, timing) are saved to the backend database.
+- All responses (identifier, comparisons, demographics, climate, stress,
+  timing, optional payment-opt-out initials) are saved to the backend
+  database. Consent initials are no longer collected (clicking "I agree" is
+  the signature); `consent_initials` remains in the DB but is stored empty.
 
 ## 3. Agreed decisions
 
@@ -237,7 +239,6 @@ Response `201`:
 Body (mirrors `SurveyState`, keyed by real IDs):
 ```json
 {
-  "consentInitials": "HZ",
   "paymentOptOutInitials": "",
   "identifier": "user@example.com",
   "surveyPhase": 1,

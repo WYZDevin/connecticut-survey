@@ -18,15 +18,12 @@ export default function ConsentPage() {
   const navigate = useNavigate();
   const {
     state,
-    setConsentInitials,
     setPaymentOptOutInitials,
     setSession,
   } = useSurvey();
   const [declined, setDeclined] = useState(false);
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const canAgree = state.consentInitials.trim().length > 0;
 
   function handleRefuse() {
     setDeclined(true);
@@ -37,7 +34,7 @@ export default function ConsentPage() {
     if (creating) return;
     // Back-navigation guard: an existing session is reused, never re-created.
     if (state.sessionId) {
-      navigate('/welcome');
+      navigate('/survey/identifier');
       return;
     }
     setCreating(true);
@@ -52,7 +49,7 @@ export default function ConsentPage() {
           imageB: { src: p.rightImageUrl, label: 'Right' },
         })),
       );
-      navigate('/welcome');
+      navigate('/survey/identifier');
     } catch {
       setError(
         'Could not start the survey. Please check your internet connection and press "I agree" again.',
@@ -82,16 +79,16 @@ export default function ConsentPage() {
     <div className="flex-1 p-4">
       <div className="max-w-3xl mx-auto my-8">
         <div className="bg-white rounded-2xl shadow-lg p-8">
-          <p className="text-xs text-gray-500 mb-1">
+          <p className="text-xs text-gray-500 mb-4">
             Version: A, B &middot; Protocol #: 26-127
           </p>
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">
+          <h2 className="text-base font-semibold text-gray-700 text-center mb-2">
             Cognitive Mapping of Environmental Risk Perception in New England
             Using a Scalable Artificial Intelligence Framework
-          </h1>
-          <h2 className="text-base font-semibold text-gray-600 mb-4">
-            Subject Information and Informed Consent Form (SBR)
           </h2>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 text-center uppercase mb-6">
+            Subject Information and Informed Consent Form (SBR)
+          </h1>
 
           <div className="bg-gray-50 rounded-lg p-4 mb-6 text-sm text-gray-700 space-y-1">
             <p>
@@ -405,18 +402,6 @@ export default function ConsentPage() {
               browser&rsquo;s Print function to print this page before starting
               the survey.
             </p>
-            <label className="block text-sm font-medium text-gray-800 mb-2">
-              Please enter your initials to confirm you have read this consent
-              form:
-            </label>
-            <input
-              type="text"
-              maxLength={5}
-              value={state.consentInitials}
-              onChange={(e) => setConsentInitials(e.target.value)}
-              placeholder="e.g. HZ"
-              className="w-32 border-2 border-gray-300 rounded-lg px-3 py-2 text-center text-lg focus:border-blue-600 outline-none mb-6"
-            />
             {error && (
               <p
                 role="alert"
@@ -427,10 +412,10 @@ export default function ConsentPage() {
             )}
             <div className="flex flex-col sm:flex-row gap-3">
               <button
-                disabled={!canAgree || creating}
+                disabled={creating}
                 onClick={handleAgree}
                 className={`flex-1 px-8 py-3 rounded-lg text-lg font-medium transition-colors ${
-                  canAgree && !creating
+                  !creating
                     ? 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer'
                     : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                 }`}
@@ -444,12 +429,6 @@ export default function ConsentPage() {
                 I refuse
               </button>
             </div>
-            {!canAgree && (
-              <p className="text-xs text-gray-500 mt-2">
-                Enter your initials above to enable the &lsquo;I agree&rsquo;
-                button.
-              </p>
-            )}
           </div>
         </div>
       </div>

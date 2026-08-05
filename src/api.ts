@@ -23,7 +23,6 @@ export interface SubmitComparison {
 }
 
 export interface SubmitPayload {
-  consentInitials: string;
   paymentOptOutInitials: string;
   identifier: string;
   surveyPhase: number;
@@ -78,7 +77,6 @@ export function buildSubmitPayload(
     }
   }
   return {
-    consentInitials: state.consentInitials,
     paymentOptOutInitials: state.paymentOptOutInitials,
     identifier: state.identifierResponse,
     surveyPhase,

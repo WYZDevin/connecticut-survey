@@ -80,7 +80,6 @@ def seed_blocks():
 
 def make_payload(pair_ids: list[str]) -> dict:
     return {
-        "consentInitials": "HZ",
         "paymentOptOutInitials": "",
         "identifier": "test@example.com",
         "surveyPhase": 1,

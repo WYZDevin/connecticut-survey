@@ -13,7 +13,6 @@ import type {
 } from '../types/survey';
 
 type SurveyAction =
-  | { type: 'SET_CONSENT_INITIALS'; value: string }
   | { type: 'SET_PAYMENT_OPTOUT_INITIALS'; value: string }
   | { type: 'SET_IDENTIFIER'; value: string }
   | { type: 'SET_DEMOGRAPHIC'; questionId: string; value: string }
@@ -32,7 +31,6 @@ function createInitialState(): SurveyState {
     startTime: Date.now(),
     sessionId: null,
     imagePairs: [],
-    consentInitials: '',
     paymentOptOutInitials: '',
     identifierResponse: '',
     demographicResponses: {},
@@ -45,8 +43,6 @@ function createInitialState(): SurveyState {
 
 function surveyReducer(state: SurveyState, action: SurveyAction): SurveyState {
   switch (action.type) {
-    case 'SET_CONSENT_INITIALS':
-      return { ...state, consentInitials: action.value };
     case 'SET_PAYMENT_OPTOUT_INITIALS':
       return { ...state, paymentOptOutInitials: action.value };
     case 'SET_IDENTIFIER':
@@ -118,10 +114,6 @@ export function useSurvey() {
 
   const { state, dispatch } = context;
 
-  function setConsentInitials(value: string) {
-    dispatch({ type: 'SET_CONSENT_INITIALS', value });
-  }
-
   function setPaymentOptOutInitials(value: string) {
     dispatch({ type: 'SET_PAYMENT_OPTOUT_INITIALS', value });
   }
@@ -159,7 +151,6 @@ export function useSurvey() {
 
   return {
     state,
-    setConsentInitials,
     setPaymentOptOutInitials,
     setIdentifierResponse,
     setDemographicResponse,

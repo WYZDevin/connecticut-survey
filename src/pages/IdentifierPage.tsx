@@ -27,7 +27,7 @@ export default function IdentifierPage() {
           <div className="mt-8 flex justify-end">
             <button
               disabled={!canProceed}
-              onClick={() => navigate('/survey/comparison/0')}
+              onClick={() => navigate('/welcome')}
               className={`px-8 py-3 rounded-lg text-lg font-medium transition-colors ${
                 canProceed
                   ? 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer'

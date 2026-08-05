@@ -117,7 +117,7 @@ export default function ThankYouPage() {
             {/* Consent */}
             <h3 className="font-semibold text-gray-800">Consent</h3>
             <p className="text-blue-600">
-              Initials: {state.consentInitials || '\u2014'}
+              Agreed
               {state.paymentOptOutInitials
                 ? ` (declined payment: ${state.paymentOptOutInitials})`
                 : ''}
