@@ -1,7 +1,10 @@
 """Export completed survey responses to CSV files for analysis.
 
 Usage:
-    python scripts/export_responses.py [--out-dir DIR]
+    python scripts/export_responses.py [--azure] [--out-dir DIR]
+
+--azure exports from the production Azure database, reading credentials from
+backend/.env.azure; otherwise DATABASE_URL (or the local dev .env) is used.
 
 Writes submissions.csv (one row per participant, JSONB answers flattened) and
 comparisons.csv (one row per pair x prompt judgment, joined with pair images).
@@ -44,12 +47,45 @@ COMPARISONS_SQL = text(
 )
 
 
+def azure_database_url() -> str:
+    env_path = Path(__file__).resolve().parent.parent / ".env.azure"
+    if not env_path.exists():
+        raise SystemExit(
+            f"{env_path} not found — it holds the Azure DB credentials "
+            "(created during provisioning; never committed)"
+        )
+    values: dict[str, str] = {}
+    for line in env_path.read_text().splitlines():
+        if "=" in line and not line.lstrip().startswith("#"):
+            key, val = line.split("=", 1)
+            values[key.strip()] = val.strip().strip("'\"")
+    try:
+        user, password, host = (
+            values["AZURE_PG_ADMIN"],
+            values["AZURE_PG_PASSWORD"],
+            values["AZURE_PG_HOST"],
+        )
+    except KeyError as exc:
+        raise SystemExit(f"{env_path} is missing {exc}")
+    return (
+        f"postgresql+psycopg://{user}:{password}@{host}:5432/survey?sslmode=require"
+    )
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--out-dir", type=Path, default=Path("export"))
+    parser.add_argument(
+        "--azure",
+        action="store_true",
+        help="export from the production Azure database (credentials from .env.azure)",
+    )
     args = parser.parse_args()
 
-    database_url = os.environ.get("DATABASE_URL")
+    if args.azure:
+        database_url = azure_database_url()
+    else:
+        database_url = os.environ.get("DATABASE_URL")
     if not database_url:
         from app.config import settings
 
