@@ -1,0 +1,7 @@
+backend/
+svi/
+public/svi/
+public/svi_neus/
+dist/
+node_modules/
+*.md

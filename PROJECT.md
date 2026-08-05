@@ -307,20 +307,26 @@ Only `status='submitted'` sessions are exported.
 | `ADMIN_EXPORT_KEY` | only if the export endpoint is built |
 | `AZURE_STORAGE_CONNECTION_STRING` | ingest script only, not the API |
 
-## 12. Deployment
+## 12. Deployment (live resources, deployed 2026-08-05)
 
-- **PostgreSQL**: Flexible Server, burstable B1ms, public access with Azure
-  firewall allowing App Service outbound + your dev IP; database `survey`.
-- **API**: App Service (Linux, Python 3.12), startup
-  `uvicorn app.main:app --host 0.0.0.0 --port 8000`; deploy `backend/` via
-  `az webapp up` or GitHub Actions. Run `alembic upgrade head` on deploy.
-- **Blob Storage**: storage account + container `svi` (public blob access);
-  run `ingest_pairs.py` once from a dev machine.
-- **Frontend**: Vercel project rooted at repo root; set `VITE_API_BASE_URL`.
-  Exclude `public/svi*/` and `svi/` from the build (they are gitignored/source
-  data, not deploy assets).
-- Order: DB → migrate → ingest → API → verify `/api/health` + a manual session
-  → frontend env → Vercel deploy → end-to-end test.
+All Azure resources live in resource group **`ct-survey-rg`** (subscription
+"Azure subscription 1"). Compute/DB are in **centralus** (eastus/eastus2 were
+capacity-restricted for Flexible Server on this subscription); storage is in
+eastus2.
+
+| Piece | Resource | Notes |
+|---|---|---|
+| PostgreSQL | `ct-survey-pg-hz2026.postgres.database.azure.com` (Flexible Server, B1ms, PG16) | DB `survey`; admin `surveyadmin` (password in `backend/.env.azure`, gitignored); firewall: dev IP + Azure services |
+| API | `https://ct-survey-api-hz2026.azurewebsites.net` (App Service Linux B1, Python 3.12) | startup `python -m uvicorn app.main:app --host 0.0.0.0 --port 8000`; zip deploy with Oryx build |
+| Images | `https://ctsurveysvihz2026.blob.core.windows.net/svi/` (public-read blob) | 200 images uploaded via `ingest_pairs.py` |
+| Frontend | `https://connecticut-survey.vercel.app` (Vercel project `connecticut-survey`) | `VITE_API_BASE_URL` set in Vercel prod env |
+
+Redeploy commands:
+- API: `cd backend && zip -r deploy.zip app alembic alembic.ini requirements.txt scripts -x '*__pycache__*' && az webapp deploy -g ct-survey-rg -n ct-survey-api-hz2026 --type zip --src-path deploy.zip`
+- Schema: `cd backend && DATABASE_URL=<azure url from .env.azure> .venv/bin/alembic upgrade head`
+- New pairing rounds: `ingest_pairs.py` with `AZURE_STORAGE_CONNECTION_STRING` and Azure `DATABASE_URL` set (uploads only new images, never resets counts)
+- Frontend: `vercel --prod --yes` from repo root
+- Export: `DATABASE_URL=<azure url> python scripts/export_responses.py`
 
 ## 13. Implementation milestones
 

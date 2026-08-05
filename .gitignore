@@ -41,3 +41,6 @@ backend/export/
 # Secrets
 .env
 .env.local
+.env.azure
+.vercel
+.env*
