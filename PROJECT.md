@@ -12,8 +12,8 @@ compare pairs of street-view images and answer short questionnaires. Current flo
 (all client-side, React SPA):
 
 ```
-/            ConsentPage      — consent form; clicking "I agree" is the signature (no initials)
-/survey/identifier            — first question: email (phase 1) or Prolific ID (phase 2), see src/data/config.ts
+/            IdentifierPage   — first question: email (phase 1) or Prolific ID (phase 2), see src/data/config.ts
+/consent     ConsentPage      — consent form; clicking "I agree" is the signature (no initials)
 /welcome     WelcomePage
 /survey/comparison/:index     — image-pair comparisons (currently 20 random pairs; becomes 20 assigned pairs)
 /survey/demographics          — Q1–Q3 single-choice

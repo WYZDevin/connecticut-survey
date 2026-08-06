@@ -20,9 +20,9 @@ export default function App() {
           <SiteHeader />
           <main className="flex-1 flex flex-col">
             <Routes>
-              <Route path="/" element={<ConsentPage />} />
+              <Route path="/" element={<IdentifierPage />} />
+              <Route path="/consent" element={<ConsentPage />} />
               <Route path="/welcome" element={<WelcomePage />} />
-              <Route path="/survey/identifier" element={<IdentifierPage />} />
               <Route
                 path="/survey/comparison/:index"
                 element={<ImageComparisonPage />}

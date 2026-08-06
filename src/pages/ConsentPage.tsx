@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSurvey } from '../hooks/useSurvey';
 import { createSession } from '../api';
@@ -25,6 +25,13 @@ export default function ConsentPage() {
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // The identifier is asked first; a direct visit to /consent without one
+  // would otherwise fail backend validation at final submit.
+  const hasIdentifier = state.identifierResponse.trim().length > 0;
+  useEffect(() => {
+    if (!hasIdentifier) navigate('/', { replace: true });
+  }, [hasIdentifier, navigate]);
+
   function handleRefuse() {
     setDeclined(true);
     window.close();
@@ -34,7 +41,7 @@ export default function ConsentPage() {
     if (creating) return;
     // Back-navigation guard: an existing session is reused, never re-created.
     if (state.sessionId) {
-      navigate('/survey/identifier');
+      navigate('/welcome');
       return;
     }
     setCreating(true);
@@ -49,7 +56,7 @@ export default function ConsentPage() {
           imageB: { src: p.rightImageUrl, label: 'Right' },
         })),
       );
-      navigate('/survey/identifier');
+      navigate('/welcome');
     } catch {
       setError(
         'Could not start the survey. Please check your internet connection and press "I agree" again.',
